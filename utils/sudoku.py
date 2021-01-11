@@ -1,4 +1,5 @@
 from random import shuffle, seed as random_seed, randrange
+from copy import deepcopy
 import sys
 
 class _SudokuSolver:
@@ -185,6 +186,71 @@ class Sudoku:
 
     def solve(self):
         return _SudokuSolver(self)._solve()
+
+    def is_legal_puzzle(self):
+
+        print("[INFO] checking given puzzle legality...")
+
+        # checking row rules
+        print("[INFO] checking row rules...")
+        rows = self.board
+        for i in range(self.size):
+
+            # remove all zeros
+            row = rows[i]
+            row_copy = list()
+            for digit in row:
+                if digit:
+                    row_copy.append(digit)
+
+            # check duplicates
+            row_dict = set(row_copy)
+            if len(row_dict) != len(row_copy):
+                return False
+            else:
+                print("[INFO] row {} passed.".format(i))
+
+        # checking column rules
+        print("[INFO] checking column rules...")
+        columns = list()
+        for i in range(self.size):
+            columns.append(list())
+        for i in range(self.size):
+            for j in range(self.size):
+                columns[i].append(self.board[j][i])
+        for i in range(self.size):
+            column = columns[i]
+
+            # remove all zeros
+            column_copy = list()
+            for digit in column:
+                if digit:
+                    column_copy.append(digit)
+
+            # check duplicates
+            column_dict = set(column_copy)
+            if len(column_dict) != len(column_copy):
+                return False
+            else:
+                print("[INFO] column {} passed.".format(i))
+
+        # checking block rules
+        print("[INFO] checking block rules...")
+        for i in range(3):
+            for j in range(3):
+                block_list = list()
+                for k in range(3*i, 3*i+3):
+                    for l in range(3*j, 3*j+3):
+                        if self.board[k][l]:
+                            block_list.append(self.board[k][l])
+
+                block_dict = set(block_list)
+                if len(block_dict) != len(block_list):
+                    return False
+                else:
+                    print("[INFO] block ({}, {}) passed.".format(i+1, j+1))
+
+        return True
 
     def validate(self):
         row_numbers = [[False for _ in range(self.size)] for _ in range(self.size)]
